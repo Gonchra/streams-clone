@@ -1,13 +1,22 @@
+import { MailerModule } from '@nestjs-modules/mailer'
 import { ApolloDriver } from '@nestjs/apollo'
 import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { GraphQLModule } from '@nestjs/graphql'
 
 import { getGraphQLConfig } from '@/src/core/config/graphql.config'
+import { getMailerConfig } from '@/src/core/config/mailer.config'
+import { AccountModule } from '@/src/modules/auth/account/account.module'
+import { DeactivateModule } from '@/src/modules/auth/deactivate/deactivate.module'
+import { PasswordRecoveryModule } from '@/src/modules/auth/password-recovery/password-recovery.module'
+import { SessionModule } from '@/src/modules/auth/session/session.module'
+import { TotpModule } from '@/src/modules/auth/totp/totp.module'
+import { VerificationModule } from '@/src/modules/auth/verification/verification.module'
+import { MailModule } from '@/src/modules/libs/mail/mail.module'
 import { IS_DEV_ENV } from '@/src/shared/utils/is-dev.util'
 
 import { PrismaModule } from './prisma/prisma.module'
-import { RedisModule } from './redis/redis.module';
+import { RedisModule } from './redis/redis.module'
 
 @Module({
 	imports: [
@@ -23,7 +32,14 @@ import { RedisModule } from './redis/redis.module';
 			useFactory: getGraphQLConfig
 		}),
 		PrismaModule,
-		RedisModule
+		RedisModule,
+		AccountModule,
+		SessionModule,
+		MailModule,
+		VerificationModule,
+		PasswordRecoveryModule,
+		TotpModule,
+		DeactivateModule
 	]
 })
 export class CoreModule {}

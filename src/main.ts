@@ -15,6 +15,13 @@ async function bootstrap() {
 	const app = await NestFactory.create(CoreModule)
 	const config = app.get(ConfigService)
 	const redis = app.get(RedisService)
+
+	app.enableCors({
+		origin: config.getOrThrow<string>('ALLOWED_ORIGIN'),
+		credentials: true,
+		exposedHeaders: ['set-cookie']
+	})
+
 	app.use(cookieParser(config.getOrThrow<string>('COOKIES_SECRET')))
 
 	app.useGlobalPipes(
@@ -22,6 +29,8 @@ async function bootstrap() {
 			transform: true
 		})
 	)
+
+	const maxAge = ms(config.getOrThrow<StringValue>('SESSION_MAX_AGE'))
 
 	app.use(
 		session({
@@ -31,7 +40,7 @@ async function bootstrap() {
 			saveUninitialized: false,
 			cookie: {
 				domain: config.getOrThrow<string>('SESSION_DOMAIN'),
-				maxAge: ms(config.getOrThrow<StringValue>('SESSION_MAX_AGE')),
+				maxAge,
 				httpOnly: parseBoolean(
 					config.getOrThrow<string>('SESSION_HTTP_ONLY')
 				),
@@ -42,16 +51,17 @@ async function bootstrap() {
 			},
 			store: new RedisStore({
 				client: redis,
-				prefix: config.getOrThrow<string>('SESSION_FOLDER')
+				prefix: config.getOrThrow<string>('SESSION_FOLDER'),
+				ttl: Math.floor(maxAge / 1000)
 			})
 		})
 	)
 
-	app.enableCors({
-		origin: config.getOrThrow<string>('ALLOWED_ORIGIN'),
-		credentials: true,
-		exposedHeaders: ['set-cookie']
-	})
+	// redis.monitor((err, monitor) => {
+	// 	monitor?.on('monitor', (time, args) => {
+	// 		console.log('Redis command:', args)
+	// 	})
+	// })
 
 	await app.listen(config.getOrThrow<number>('APPLICATION_PORT'))
 }
