@@ -14,6 +14,7 @@ import { VerificationModule } from '@/src/modules/auth/verification/verification
 import { CronModule } from '@/src/modules/cron/cron.module'
 import { MailModule } from '@/src/modules/libs/mail/mail.module'
 import { StorageModule } from '@/src/modules/libs/storage/storage.module'
+import { StreamModule } from '@/src/modules/stream/stream.module'
 import { IS_DEV_ENV } from '@/src/shared/utils/is-dev.util'
 
 import { PrismaModule } from './prisma/prisma.module'
@@ -43,7 +44,8 @@ import { RedisModule } from './redis/redis.module'
 		TotpModule,
 		DeactivateModule,
 		CronModule,
-		ProfileModule
+		ProfileModule,
+		StreamModule
 	]
 })
 export class CoreModule {}
