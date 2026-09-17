@@ -2,8 +2,10 @@ import { Field, ID, ObjectType } from '@nestjs/graphql'
 import { User } from '@prisma/generated/client'
 
 import { SocialLinkModel } from '@/src/modules/auth/profile/models/social-link.model'
-import { StreamModel } from '@/src/modules/stream/models/stream.model'
 import { FollowModel } from '@/src/modules/follow/models/follow.model'
+import { NotificationSettingsModel } from '@/src/modules/notification/models/notification-settings.model'
+import { NotificationModel } from '@/src/modules/notification/models/notification.model'
+import { StreamModel } from '@/src/modules/stream/models/stream.model'
 
 @ObjectType()
 export class UserModel implements User {
@@ -31,6 +33,9 @@ export class UserModel implements User {
 		nullable: true
 	})
 	bio: string
+
+	@Field(() => String, { nullable: true })
+	telegramId: string
 
 	@Field(() => Boolean)
 	isVerified: boolean
@@ -61,6 +66,12 @@ export class UserModel implements User {
 
 	@Field(() => StreamModel)
 	stream: StreamModel
+
+	@Field(() => [NotificationModel])
+	notifications: NotificationModel[]
+
+	@Field(() => NotificationSettingsModel)
+	notificationSettings: NotificationSettingsModel
 
 	@Field(() => Date)
 	createdAt: Date
