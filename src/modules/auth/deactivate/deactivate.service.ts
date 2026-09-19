@@ -12,6 +12,7 @@ import type { Request } from 'express'
 import { PrismaService } from '@/src/core/prisma/prisma.service'
 import { DeactivateAccountInput } from '@/src/modules/auth/deactivate/inputs/deactivate-account.input'
 import { MailService } from '@/src/modules/libs/mail/mail.service'
+import { TelegramService } from '@/src/modules/libs/telegram/telegram.service'
 import { generateToken } from '@/src/shared/utils/generate-token.util'
 import { getSessionMetadata } from '@/src/shared/utils/session-metadata.util'
 import { destroySession } from '@/src/shared/utils/session.util'
@@ -21,7 +22,8 @@ export class DeactivateService {
 	constructor(
 		private readonly prismaService: PrismaService,
 		private readonly configService: ConfigService,
-		private readonly mailService: MailService
+		private readonly mailService: MailService,
+		private readonly telegramService: TelegramService
 	) {}
 
 	async deactivate(
@@ -106,6 +108,17 @@ export class DeactivateService {
 			deactivateToken.token,
 			metadata
 		)
+
+		if (
+			deactivateToken.user.notificationSettings!.telegramNotifications &&
+			user.telegramId
+		) {
+			await this.telegramService.sendDeactivateToken(
+				user.telegramId,
+				deactivateToken.token,
+				metadata
+			)
+		}
 
 		return true
 	}
