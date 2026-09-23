@@ -1,6 +1,7 @@
 import { Args, Query, Resolver } from '@nestjs/graphql'
 
 import { UserModel } from '@/src/modules/auth/account/models/user.model'
+import { SubscriptionModel } from '@/src/modules/sponsorship/subscription/models/subscription.model'
 
 import { ChannelService } from './channel.service'
 
@@ -21,5 +22,10 @@ export class ChannelResolver {
 	@Query(() => Number, { name: 'findFollowersCountByChannel' })
 	async findFollowersCountByChannel(@Args('channelId') channelId: string) {
 		return this.channelService.findFollowersCountByChannel(channelId)
+	}
+
+	@Query(() => [SubscriptionModel], { name: 'findSponsorsByChannel' })
+	async findSponsorsByChannel(@Args('channelId') channelId: string) {
+		return this.channelService.findSponsorsByChannel(channelId)
 	}
 }

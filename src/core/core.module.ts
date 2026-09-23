@@ -5,6 +5,7 @@ import { GraphQLModule } from '@nestjs/graphql'
 
 import { getGraphQLConfig } from '@/src/core/config/graphql.config'
 import { getLiveKitConfig } from '@/src/core/config/livekit.config'
+import { getStripeConfig } from '@/src/core/config/stripe.config'
 import { AccountModule } from '@/src/modules/auth/account/account.module'
 import { DeactivateModule } from '@/src/modules/auth/deactivate/deactivate.module'
 import { PasswordRecoveryModule } from '@/src/modules/auth/password-recovery/password-recovery.module'
@@ -20,8 +21,12 @@ import { FollowModule } from '@/src/modules/follow/follow.module'
 import { LivekitModule } from '@/src/modules/libs/livekit/livekit.module'
 import { MailModule } from '@/src/modules/libs/mail/mail.module'
 import { StorageModule } from '@/src/modules/libs/storage/storage.module'
+import { StripeModule } from '@/src/modules/libs/stripe/stripe.module'
 import { TelegramModule } from '@/src/modules/libs/telegram/telegram.module'
 import { NotificationModule } from '@/src/modules/notification/notification.module'
+import { PlanModule } from '@/src/modules/sponsorship/plan/plan.module'
+import { SubscriptionModule } from '@/src/modules/sponsorship/subscription/subscription.module'
+import { TransactionModule } from '@/src/modules/sponsorship/transaction/transaction.module'
 import { IngressModule } from '@/src/modules/stream/ingress/ingress.module'
 import { StreamModule } from '@/src/modules/stream/stream.module'
 import { WebhookModule } from '@/src/modules/webhook/webhook.module'
@@ -43,16 +48,21 @@ import { RedisModule } from './redis/redis.module'
 			inject: [ConfigService],
 			useFactory: getGraphQLConfig
 		}),
-		PrismaModule,
-		RedisModule,
-		StorageModule,
-		AccountModule,
-		SessionModule,
 		LivekitModule.forRootAsync({
 			imports: [ConfigModule],
 			useFactory: getLiveKitConfig,
 			inject: [ConfigService]
 		}),
+		StripeModule.forRootAsync({
+			inject: [ConfigService],
+			useFactory: getStripeConfig,
+			imports: [ConfigModule]
+		}),
+		PrismaModule,
+		RedisModule,
+		StorageModule,
+		AccountModule,
+		SessionModule,
 		MailModule,
 		VerificationModule,
 		PasswordRecoveryModule,
@@ -68,7 +78,10 @@ import { RedisModule } from './redis/redis.module'
 		FollowModule,
 		ChannelModule,
 		NotificationModule,
-		TelegramModule
+		TelegramModule,
+		PlanModule,
+		SubscriptionModule,
+		TransactionModule
 	]
 })
 export class CoreModule {}

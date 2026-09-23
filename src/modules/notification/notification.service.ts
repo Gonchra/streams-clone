@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import {
 	NotificationType,
+	SponsorshipPlan,
 	TokenType,
 	type User
 } from '@prisma/generated/client'
@@ -73,6 +74,61 @@ export class NotificationService {
 							<p>Это пользователь <a href="/${follower.username}" className="font-semibold">
 							 	${follower.displayName}</a>.</p>`,
 				type: NotificationType.NEW_FOLLOWER,
+				user: {
+					connect: {
+						id: userId
+					}
+				}
+			}
+		})
+
+		return notification
+	}
+
+	async createNewSponsorship(
+		userId: string,
+		plan: SponsorshipPlan,
+		sponsor: User
+	) {
+		const notification = await this.prismaService.notification.create({
+			data: {
+				message: `<b className="font-medium">У вас новый спонсор!</b>
+						  <p>Пользователь <a href="/${sponsor.username}" className="font-semibold">${sponsor.displayName}</a> стал вашим спонсором, выбрав план <strong>${plan.title}</strong>.</p>`,
+				type: NotificationType.NEW_SPONSORSHIP,
+				user: {
+					connect: {
+						id: userId
+					}
+				}
+			}
+		})
+
+		return notification
+	}
+
+	async createEnableTwoFactor(userId: string) {
+		const notification = await this.prismaService.notification.create({
+			data: {
+				message: `<b className="font-medium">Обеспечьте свою безопасность!</b>
+						  <p>Включите двухфакторную аутентификацию в настройках вашего аккаунта, чтобы повысить уровень защиты.</p>`,
+				type: NotificationType.ENABLE_TWO_FACTOR,
+				user: {
+					connect: {
+						id: userId
+					}
+				}
+			}
+		})
+
+		return notification
+	}
+
+	async createVerifyChannel(userId: string) {
+		const notification = await this.prismaService.notification.create({
+			data: {
+				message: `<b className="font-medium">Поздравляем!</b>
+						  <p>Ваш канал верифицирован, и теперь рядом с вашим каналом будет галочка.</p>`,
+				type: NotificationType.VERIFIED_CHANNEL,
 				user: {
 					connect: {
 						id: userId
